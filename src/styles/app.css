@@ -1065,22 +1065,204 @@ h1, h2, h3, h4, h5 { margin: 0; font-weight: 600; line-height: 1.35; }
 /* ---------------- 响应式 ---------------- */
 
 @media (max-width: 860px) {
-  .topbar { padding: 0.75rem 1rem; gap: 0.8rem; }
-  .topbar__stats { width: 100%; }
   .main { padding: 1rem 1rem 2.5rem; }
-  .domainbar { padding: 0.85rem 1rem 0.75rem; }
   .detail__title { font-size: 1.25rem; }
   .qcard { flex-wrap: wrap; }
   .qcard__left { flex-direction: row; align-items: center; min-width: 0; }
   .qcard__right { flex-direction: row; width: 100%; justify-content: flex-start; }
   .search { width: 100%; max-width: none; }
   .panel__tools { width: 100%; }
+
+  /* ---- 顶栏：改成「品牌一行 + 导航横排一行」----
+     旧版 .topbar/.module-nav 都 flex-wrap:wrap，而导航项是 column 布局，
+     窄屏下每个导航项被挤成一列竖排，把整屏高度吃掉大半。
+     现在：导航强制单行、横向滚动，项改为横排且不换行。 */
+  .topbar {
+    display: block;
+    padding: 0.5rem 0.85rem 0;
+  }
+  .topbar__brand {
+    margin-bottom: 0.4rem;
+    gap: 0.5rem;
+  }
+  .brand__mark { font-size: 0.7rem; padding: 0.25rem 0.4rem; }
+  .brand__title { font-size: 0.84rem; }
+  .brand__sub { display: none; }
+
+  .module-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.25rem;
+    /* 用负 margin 让滚动区顶到屏幕边缘，视觉上更像原生标签栏 */
+    margin: 0 -0.85rem;
+    padding: 0 0.85rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .module-nav::-webkit-scrollbar { display: none; }
+
+  .module-nav__item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    padding: 0.3rem 0.55rem;
+    white-space: nowrap;
+  }
+  .module-nav__hint { display: none; }
+  .module-nav__label { font-size: 0.8rem; }
+
+  .topbar__stats {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: auto;
+    margin: 0 -0.85rem;
+    padding: 0.4rem 0.85rem 0.45rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topbar__stats::-webkit-scrollbar { display: none; }
+  .topbar__stats .badge { flex: 0 0 auto; }
+
+  /* ---- 分区条：去掉标签与长描述，只留可横滚的 tab ---- */
+  .domainbar { padding: 0.55rem 0.85rem 0.6rem; }
+  .domainbar__label { display: none; }
+  .domainbar__desc { display: none; }
+  .domainbar__tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.4rem;
+    margin: 0 -0.85rem;
+    padding: 0 0.85rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .domainbar__tabs::-webkit-scrollbar { display: none; }
+  .domaintab { flex: 0 0 auto; }
 }
 
 @media (max-width: 560px) {
   .card-grid { grid-template-columns: 1fr; }
-  .brand__sub { display: none; }
-  .filterbar__label { min-width: 100%; }
+
+  /* 小屏进一步压缩：提示条与分组间距收紧，把可视区域留给内容 */
+  .notice { padding: 0.55rem 0.7rem; font-size: 0.76rem; line-height: 1.65; }
+  .panel { padding: 0.9rem 0.85rem; }
+  .block { margin-top: 1rem; }
+  .backbar { padding: 0.45rem 0.6rem; margin-bottom: 0.7rem; }
+
+  /* ---- 筛选器改成横向滚动 ----
+     旧版 .segmented 是 flex-wrap:wrap，分类有 7~8 个按钮，
+     在 390px 宽下会折成 6~8 行，把列表挤到屏幕外。
+     现在每行单行横滚，标签固定在左侧。 */
+  .filterbar { padding: 0.6rem 0.7rem; }
+  .filterbar__row {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+  }
+  .filterbar__label {
+    min-width: 2.2em;
+    flex: 0 0 auto;
+    writing-mode: horizontal-tb;
+  }
+  .segmented {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.3rem;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .segmented::-webkit-scrollbar { display: none; }
+  .segmented__btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.28rem 0.6rem;
+    font-size: 0.76rem;
+  }
+  .segmented__count { font-size: 0.66rem; }
+
+  /* 面板头部：标题与搜索框纵向堆叠，避免标题被压窄换行 */
+  .panel__head { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .panel__tools { width: 100%; }
+
+  /* ---- 分区 tab 去掉副标题行 ----
+     「硬件知识 / 硬件 · 32 条」两行在手机上占近 60px，
+     数量已经能从下面的列表标题看到，这里只留名称。 */
+  .domaintab { padding: 0.32rem 0.65rem; }
+  .domaintab__meta { display: none; }
+  .domaintab__name { font-size: 0.8rem; }
+
+  /* ---- 数据状态提示条压成一行 ----
+     这条信息在手机上属于「看一眼就够」的背景说明，默认展开会吃掉
+     100px 以上的首屏。改成单行截断 + 点击展开。 */
+  .notice {
+    max-height: 2.6em;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    -webkit-line-clamp: unset;
+  }
+  .notice::after {
+    content: '…展开';
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0;
+    padding: 0 0.3rem 0 0.8rem;
+    background: linear-gradient(90deg, transparent, var(--bg-elev-2) 30%);
+    color: var(--accent);
+    font-size: 0.72rem;
+  }
+  .notice.is-open {
+    max-height: none;
+  }
+  .notice.is-open::after {
+    content: '收起';
+  }
+
+  /* ---- 题目卡片：三段纵向堆叠 ----
+     旧版 .qcard 是 row 布局，手机下 left/main/right 挤在一行，
+     题干被压成每行 3~5 个字，几乎没法读。改成：
+     第一行 id + 题型 + 难度 + 状态，第二行题干，第三行分类。 */
+  .qcard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    padding: 0.7rem 0.75rem;
+  }
+  .qcard__left {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+    padding-right: 0;
+  }
+  .qcard__main { width: 100%; }
+  .qcard__stem { font-size: 0.84rem; line-height: 1.6; }
+  .qcard__right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .qcard__tags { gap: 0.4rem; }
+
+  /* 知识点卡片（kcard）也同理收紧 */
+  .kcard { padding: 0.75rem 0.8rem; }
+  .kcard__title { font-size: 0.9rem; line-height: 1.45; }
+
+  /* 练习题行：类型标签与题干分开两行 */
+  .qrow { flex-wrap: wrap; gap: 0.3rem; }
+  .qrow__stem { width: 100%; }
 }
 
 @media print {

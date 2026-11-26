@@ -380,6 +380,13 @@ async function main() {
   appEl.addEventListener('click', (event) => {
     const target = /** @type {HTMLElement} */ (event.target);
 
+    // 数据状态提示条：手机上默认折叠，点击展开/收起
+    const noticeEl = target.closest('.notice');
+    if (noticeEl && !event.target.closest('a')) {
+      noticeEl.classList.toggle('is-open');
+      return;
+    }
+
     // 分区切换
     const domainTab = target.closest('[data-domain-tab]');
     if (domainTab) {
