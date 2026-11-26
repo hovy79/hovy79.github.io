@@ -25,14 +25,15 @@ const QUESTION_SEARCH_BLOCKS = [['scoring_points', 'text'], ['pitfalls', 'text']
  * @param {import('./provider.js').Provider} provider
  */
 export async function createRepository(provider) {
-  const [taxonomy, sourcesDoc, partsDoc, knowledge, questions, companies] = await Promise.all([
+  const [taxonomy, sourcesDoc, partsDoc, knowledge, questions, companies, projects] = await Promise.all([
     provider.loadTaxonomy(),
     provider.loadSources(),
     provider.loadParts(),
     provider.loadKnowledge(),
     provider.loadQuestions(),
     // 公司档案是可选数据源：Provider 没实现就返回空数组，界面自动隐藏该模块
-    typeof provider.loadCompanies === 'function' ? provider.loadCompanies() : Promise.resolve([])
+    typeof provider.loadCompanies === 'function' ? provider.loadCompanies() : Promise.resolve([]),
+    typeof provider.loadProjects === 'function' ? provider.loadProjects() : Promise.resolve([])
   ]);
 
   /** @type {Map<string, any>} */
@@ -50,6 +51,14 @@ export async function createRepository(provider) {
     if (!c?.id) continue;
     if (companyById.has(c.id)) throw new Error(`公司档案 id 重复: ${c.id}`);
     companyById.set(c.id, c);
+  }
+
+  /** @type {Map<string, any>} */
+  const projectById = new Map();
+  for (const p of projects ?? []) {
+    if (!p?.id) continue;
+    if (projectById.has(p.id)) throw new Error(`开源项目 id 重复: ${p.id}`);
+    projectById.set(p.id, p);
   }
 
   for (const s of sourcesDoc.sources ?? []) sourceById.set(s.source_id, s);
@@ -342,6 +351,23 @@ export async function createRepository(provider) {
       );
     },
 
+    /** 开源项目库（按难度升序，方便从易到难挑） */
+    listProjects() {
+      return [...projectById.values()].sort(
+        (a, b) => (a.difficulty ?? 9) - (b.difficulty ?? 9) || String(a.id).localeCompare(String(b.id))
+      );
+    },
+
+    project(id) {
+      return projectById.get(id) ?? null;
+    },
+
+    /** 某个公司推荐的项目（company.project_id 指向这里） */
+    projectForCompany(company) {
+      const pid = company?.project_id;
+      return pid ? projectById.get(pid) ?? null : null;
+    },
+
     /** 供校验脚本/调试使用：暴露全部原始条目 */
     all() {
       return {
@@ -349,7 +375,8 @@ export async function createRepository(provider) {
         questions: [...questionById.values()],
         sources: [...sourceById.values()],
         parts: [...partByNumber.values()],
-        companies: [...companyById.values()]
+        companies: [...companyById.values()],
+        projects: [...projectById.values()]
       };
     }
   };

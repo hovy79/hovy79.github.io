@@ -14,6 +14,7 @@
  *   provider.loadQuestions()    -> Promise<Question[]>        合并两个分区
  *   provider.loadParts()        -> Promise<PartsDoc>          （可选）
  *   provider.loadCompanies()    -> Promise<Company[]>         （可选）
+ *   provider.loadProjects()     -> Promise<OssProject[]>      （可选）
  *
  * loadParts 是后加的：器件登记表用于把「型号 → 数据手册」这一步变成可追溯的。
  * 标为可选是为了不破坏已有的 Provider 实现——未实现时 Repository 会退化为
@@ -34,7 +35,7 @@ export const PROVIDER_CONTRACT = Object.freeze({
     'loadQuestions'
   ],
   /** 可选方法：未实现时上层需要降级处理 */
-  optionalMethods: ['loadParts', 'loadCompanies']
+  optionalMethods: ['loadParts', 'loadCompanies', 'loadProjects']
 });
 
 /**

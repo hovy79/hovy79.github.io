@@ -91,6 +91,8 @@ export function renderCompanyList(ctx) {
 
 function companyCard(repo, c) {
   const job = c.jobs?.[0];
+  // 优先用 project_id 指向的开源项目，兼容旧式内嵌 project
+  const ossProject = repo.projectForCompany(c);
   const project = c.project;
   const refCount = (c.knowledge_refs ?? []).length;
 
@@ -127,6 +129,8 @@ export function renderCompanyDetail(ctx) {
     return emptyState('公司档案不存在', '该 id 在当前数据源中找不到。', backLink('#/company', '返回公司列表'));
   }
 
+  // 优先用 project_id 指向的开源项目，兼容旧式内嵌 project
+  const ossProject = repo.projectForCompany(c);
   const project = c.project;
   const refs = (c.knowledge_refs ?? [])
     .map((id) => repo.knowledgeItem(id))
@@ -209,7 +213,36 @@ export function renderCompanyDetail(ctx) {
         : ''
     }
 
-    ${project ? renderProject(project) : ''}
+    ${
+      ossProject
+        ? `<section class="block block--project">
+            ${sectionHeading(`推荐复刻的开源项目`)}
+            <div class="notice notice--mixed">${renderInline(c.project_note ?? ossProject.why)}</div>
+            <a class="prjcard prjcard--inline" href="#/projects/${encodeURIComponent(ossProject.id)}">
+              <div class="prjcard__top">
+                ${badge(`难度 ${ossProject.difficulty}`, 'warn')}
+                ${badge(`⭐ ${ossProject.stars}`, 'neutral')}
+                ${badge(ossProject.license, 'ok')}
+              </div>
+              <h3 class="prjcard__name">${escapeHtml(ossProject.name)}</h3>
+              <div class="prjcard__repo">${escapeHtml(ossProject.repo)}</div>
+              <div class="prjcard__meta">
+                <span>${escapeHtml(ossProject.duration)}</span>
+                <span class="prjcard__sep">·</span>
+                <span>约 ${escapeHtml(ossProject.cost_cny)} 元</span>
+              </div>
+              <div class="refcard__cta">查看复刻步骤与资料 →</div>
+            </a>
+            <div class="answer-actions">
+              <a class="btn btn--ghost btn--sm" href="${escapeHtml(ossProject.url)}" target="_blank" rel="noopener noreferrer">
+                打开 GitHub 仓库 ↗
+              </a>
+            </div>
+          </section>`
+        : project
+          ? renderProject(project)
+          : ''
+    }
 
     <footer class="detail__foot">
       <div class="detail__foot-meta">

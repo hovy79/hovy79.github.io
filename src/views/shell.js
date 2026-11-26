@@ -22,7 +22,8 @@ const SHOW_DOMAINBAR = new Set(['kb', 'drill', 'review']);
 const MODULES = [
   { id: 'kb', label: '知识库', hash: '#/kb', hint: '原理 · 边界 · 例题解析' },
   { id: 'drill', label: '面试刷题训练', hash: '#/drill', hint: '作答 · 踩分点 · 掌握标记' },
-  { id: 'company', label: '目标公司', hash: '#/company', hint: '岗位要求 · 推荐项目 · 面试问答' }
+  { id: 'company', label: '目标公司', hash: '#/company', hint: '岗位要求 · 推荐项目 · 面试问答' },
+  { id: 'projects', label: '开源项目', hash: '#/projects', hint: '可复刻的真实仓库' }
 ];
 
 /**
@@ -45,7 +46,7 @@ export function renderShell(ctx) {
       <div class="brand__mark">HW<span>/</span>EM</div>
       <div class="brand__text">
         <div class="brand__title">嵌入式硬件工程师知识题库</div>
-        <div class="brand__sub">知识库 · 面试刷题训练 · 目标公司</div>
+        <div class="brand__sub">知识库 · 刷题 · 公司 · 开源项目</div>
       </div>
     </div>
     <nav class="module-nav" aria-label="一级模块">

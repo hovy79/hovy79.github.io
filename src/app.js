@@ -20,6 +20,7 @@ import { renderKnowledgeList, renderKnowledgeDetail } from './views/knowledge.js
 import { renderDrillList, renderDrillDetail, resolvePracticeSet } from './views/drill.js';
 import { renderReview } from './views/review.js';
 import { renderCompanyList, renderCompanyDetail } from './views/company.js';
+import { renderProjectList, renderProjectDetail } from './views/projects.js';
 import { renderAbout } from './views/about.js';
 
 const MODULE_FOR_ROUTE = {
@@ -30,6 +31,8 @@ const MODULE_FOR_ROUTE = {
   review: 'review',
   'company-list': 'company',
   'company-detail': 'company',
+  'projects-list': 'projects',
+  'projects-detail': 'projects',
   about: 'about'
 };
 
@@ -265,6 +268,12 @@ async function main() {
       case 'company-detail':
         content = renderCompanyDetail({ ...ctx, company: repo.company(route.id) });
         break;
+      case 'projects-list':
+        content = renderProjectList(ctx);
+        break;
+      case 'projects-detail':
+        content = renderProjectDetail({ ...ctx, project: repo.project(route.id) });
+        break;
       case 'about':
         content = renderAbout(ctx);
         break;
@@ -348,6 +357,8 @@ async function main() {
         return '#/drill';
       case 'company-detail':
         return '#/company';
+      case 'projects-detail':
+        return '#/projects';
       default:
         return null;
     }

@@ -1920,3 +1920,74 @@ mark.hit {
 @media (prefers-reduced-motion: reduce) {
   .unlock__card.is-error { animation: none; }
 }
+
+/* ============================================================
+   开源项目库
+   ============================================================ */
+
+.prjgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
+}
+
+.prjcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 0.95rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.prjcard:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.prjcard--inline {
+  margin: 0.7rem 0;
+  border-color: var(--accent);
+}
+.prjcard__top { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.prjcard__name {
+  margin: 0.15rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+.prjcard__repo {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+}
+.prjcard__why {
+  margin: 0.1rem 0 0;
+  font-size: 0.77rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.prjcard__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.73rem;
+  color: var(--text-faint);
+}
+.prjcard__sep { opacity: 0.4; }
+
+@media (max-width: 560px) {
+  .prjgrid { grid-template-columns: 1fr; }
+  .prjcard { padding: 0.7rem 0.75rem; }
+  .prjcard__why { -webkit-line-clamp: 3; }
+}

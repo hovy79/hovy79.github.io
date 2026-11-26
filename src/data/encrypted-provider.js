@@ -173,6 +173,9 @@ export function createEncryptedProvider(options = {}) {
     },
     async loadCompanies() {
       return (await ensureContent()).companies ?? [];
+    },
+    async loadProjects() {
+      return (await ensureContent()).projects ?? [];
     }
   };
 

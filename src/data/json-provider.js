@@ -33,14 +33,16 @@ const DEFAULT_PATHS = {
   manifest: 'data/manifest.json',
   knowledge: null,
   questions: null,
-  companies: null
+  companies: null,
+  projects: null
 };
 
 /** manifest 加载失败时的兜底（保证老站点仍能跑） */
 const FALLBACK_FILES = {
   knowledge: ['data/knowledge/hardware.json', 'data/knowledge/embedded.json'],
   questions: ['data/questions/hardware.json', 'data/questions/embedded.json'],
-  companies: []
+  companies: [],
+  projects: ['data/projects.json']
 };
 
 /**
@@ -161,7 +163,8 @@ export function createJsonProvider(options = {}) {
           return {
             knowledge: Array.isArray(doc?.knowledge) ? doc.knowledge : FALLBACK_FILES.knowledge,
             questions: Array.isArray(doc?.questions) ? doc.questions : FALLBACK_FILES.questions,
-            companies: Array.isArray(doc?.companies) ? doc.companies : FALLBACK_FILES.companies
+            companies: Array.isArray(doc?.companies) ? doc.companies : FALLBACK_FILES.companies,
+            projects: Array.isArray(doc?.projects) ? doc.projects : FALLBACK_FILES.projects
           };
         } catch {
           return { ...FALLBACK_FILES };
@@ -226,6 +229,12 @@ export function createJsonProvider(options = {}) {
       if (!files.length) return [];
       loadedCounts = { ...(loadedCounts ?? { knowledge: 0, questions: 0 }), companies: files.length };
       return fetchMerged(files, 'companies');
+    },
+    /** 开源项目库（可选） */
+    async loadProjects() {
+      const files = paths.projects ?? (await loadManifest()).projects;
+      if (!files || !files.length) return [];
+      return fetchMerged(files, 'projects');
     }
   };
 

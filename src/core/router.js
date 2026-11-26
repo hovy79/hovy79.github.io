@@ -9,6 +9,8 @@
  *   #/review                    薄弱点 / 错题中心
  *   #/company                   目标公司列表（求职向）
  *   #/company/:id               单个公司的岗位要求 + 推荐项目 + 面试问答
+ *   #/projects                  开源项目库（可复刻的真实仓库）
+ *   #/projects/:id              单个项目的资料与复刻步骤
  *   #/about                     数据来源与可信度说明
  *
  * 查询参数统一解析为 filters，避免每个视图各自解析字符串。
@@ -39,6 +41,8 @@ const ROUTES = [
   { name: 'review', pattern: /^\/review\/?$/ },
   { name: 'company-list', pattern: /^\/company\/?$/ },
   { name: 'company-detail', pattern: /^\/company\/([^/]+)\/?$/ },
+  { name: 'projects-list', pattern: /^\/projects\/?$/ },
+  { name: 'projects-detail', pattern: /^\/projects\/([^/]+)\/?$/ },
   { name: 'about', pattern: /^\/about\/?$/ }
 ];
 
@@ -79,6 +83,8 @@ export function buildHash(name, { id, filters } = {}) {
     review: '#/review',
     'company-list': '#/company',
     'company-detail': `#/company/${encodeURIComponent(id ?? '')}`,
+    'projects-list': '#/projects',
+    'projects-detail': `#/projects/${encodeURIComponent(id ?? '')}`,
     about: '#/about',
     'not-found': '#/kb'
   }[name] ?? '#/kb';
