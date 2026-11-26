@@ -1,0 +1,14 @@
+{
+  "name": "embedded-hw-interview-drill",
+  "version": "0.2.0",
+  "built_at": "2026-11-25T14:48:42.832Z",
+  "files": 21,
+  "content": {
+    "knowledge": 59,
+    "questions": 168,
+    "companies": 16,
+    "sources": 32,
+    "encrypted": true
+  },
+  "note": "纯静态站点，无需 Node 运行时。"
+}
