@@ -144,6 +144,33 @@ export function renderAbout(ctx) {
     </div>
 
     <div class="block">
+      ${sectionHeading('口碑数据的来源与局限')}
+      <p class="hint">
+        关于加班时长、调休政策、双休真实性——这三项<b>公开渠道几乎查不到可靠数据</b>。
+        本系统的公司页只收录「可查证」的信息，并逐条标注证据等级。渠道现状：
+      </p>
+      <table class="table table--sources">
+        <thead><tr><th>渠道</th><th>状态</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><b>看准网</b></td><td><span class="badge badge--bad">已关服</span></td>
+            <td>2024 年 9 月官方公告关服。国内最集中的加班/薪资匿名评价源，它的关服是最大数据缺口。</td></tr>
+          <tr><td><b>脉脉</b></td><td><span class="badge badge--bad">需登录</span></td>
+            <td>直接请求返回 HTTP 418 反爬。需登录态 + 浏览器环境。</td></tr>
+          <tr><td><b>BOSS直聘</b></td><td><span class="badge badge--warn">需登录</span></td>
+            <td>公司页与岗位页均跳转人机验证页。</td></tr>
+          <tr><td><b>职友集</b></td><td><span class="badge badge--ok">可访问</span></td>
+            <td>有薪资分布与招聘趋势，<b>但没有加班/双休评价</b>。</td></tr>
+          <tr><td><b>桂林人才网</b></td><td><span class="badge badge--ok">可访问</span></td>
+            <td>有面试评价模块，但每家仅 2 条左右且全是满分，参考价值有限。</td></tr>
+        </tbody>
+      </table>
+      <p class="hint">
+        <b>结论：</b>真实的工作强度只能靠<b>面试时当面问</b>，或通过内部人脉打听。
+        公司页的「工作强度与口碑」区块提供的是提问线索，不是结论。
+      </p>
+    </div>
+
+    <div class="block">
       ${sectionHeading('进度管理')}
       <p class="hint">进度保存在浏览器 localStorage 的 <code>eh-interview-drill/progress/v1</code> 键下。换设备、换域名或清理浏览器数据会丢失，建议定期导出备份。</p>
       <div class="progress-tools">

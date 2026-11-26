@@ -62,6 +62,14 @@ export function renderCompanyList(ctx) {
       ${sectionHeading('桂林目标公司', summary.total)}
     </div>
 
+    <div class="rep-warn" style="margin-bottom:1rem">
+      <span class="rep-warn__icon">⚠</span>
+      <span><b>关于「口碑」数据：</b>加班时长、调休、双休真实性这三项，全网公开渠道几乎查不到可靠数据——
+      看准网 2024 年已关服，脉脉与 BOSS 需登录且反爬，在职员工不敢公开说。
+      每家公司页里的口碑栏都标注了<b>证据来源</b>（企业自述 / 第三方统计 / 面经 / 无信息），
+      请当作「面试提问线索」而不是结论。</span>
+    </div>
+
     <div class="notice notice--mixed">
       <strong>怎么用这一页：</strong>
       先看「主力目标」——那是薪资、门槛和你最匹配的；「冲刺」是薪资高但年限不够的，
@@ -94,6 +102,7 @@ function companyCard(repo, c) {
   // 优先用 project_id 指向的开源项目，兼容旧式内嵌 project
   const ossProject = repo.projectForCompany(c);
   const project = c.project;
+  const rep = repo.reputationOf(c.id);
   const refCount = (c.knowledge_refs ?? []).length;
 
   return `<a class="cocard" href="#/company/${encodeURIComponent(c.id)}">
@@ -132,6 +141,7 @@ export function renderCompanyDetail(ctx) {
   // 优先用 project_id 指向的开源项目，兼容旧式内嵌 project
   const ossProject = repo.projectForCompany(c);
   const project = c.project;
+  const rep = repo.reputationOf(c.id);
   const refs = (c.knowledge_refs ?? [])
     .map((id) => repo.knowledgeItem(id))
     .filter(Boolean);
@@ -176,6 +186,8 @@ export function renderCompanyDetail(ctx) {
           </section>`
         : ''
     }
+
+    ${rep ? renderReputation(rep) : ''}
 
     ${
       (c.interview_focus ?? []).length
@@ -365,4 +377,95 @@ function renderProject(p) {
 
 export function backLink(href, label) {
   return `<a class="btn btn--ghost" href="${href}">← ${escapeHtml(label)}</a>`;
+}
+
+/**
+ * 口碑区块：加班 / 福利 / 薪资信号。
+ *
+ * 核心设计：每条结论都必须带「证据等级」，因为这三项数据的公开质量极差。
+ *   official_claim      企业自述（招聘页/官网）——可能与实际不符
+ *   third_party_stats   职友集等统计站——反映招聘薪资，不代表在职薪资
+ *   interview_review    招聘平台的面试评价——样本少且偏正面
+ *   unverified_aggregator 第三方整合站——源头不明
+ *   none                没查到任何公开信息
+ */
+function renderReputation(rep) {
+  const w = rep.workload ?? {};
+  const LEVEL = {
+    official_claim: { label: '企业自述', tone: 'warn', hint: '招聘页/官网写的，未必等于实际执行' },
+    third_party_stats: { label: '第三方统计', tone: 'neutral', hint: '统计站数据，反映招聘口径' },
+    interview_review: { label: '面经', tone: 'neutral', hint: '选样本少且偏正面' },
+    unverified_aggregator: { label: '来源不明', tone: 'bad', hint: '第三方整合站，自称不担保真实性' },
+    none: { label: '无公开信息', tone: 'muted', hint: '查不到任何公开表述' }
+  };
+  const lv = LEVEL[w.evidence_level] ?? LEVEL.none;
+
+  return `<section class="block block--reputation">
+    ${sectionHeading('工作强度与口碑')}
+
+    <div class="rep-warn">
+      <span class="rep-warn__icon">⚠</span>
+      <span>加班时长、调休政策、双休真实性——<b>公开渠道几乎查不到可靠数据</b>。
+      下方每条结论都标注了证据来源，请把它当「面试时的提问线索」，而不是结论。</span>
+    </div>
+
+    <div class="rep-card">
+      <div class="rep-card__head">
+        ${badge('工作强度', 'soft')}
+        ${badge(lv.label, lv.tone, lv.hint)}
+      </div>
+      <p class="rep-card__verdict">${renderInline(w.verdict ?? '无公开信息')}</p>
+      ${w.detail ? `<p class="rep-card__detail">${renderInline(w.detail)}</p>` : ''}
+    </div>
+
+    ${
+      (rep.benefits ?? []).length
+        ? `<div class="rep-card">
+            <div class="rep-card__head">${badge('福利清单', 'ok')}</div>
+            <ul class="datalist">
+              ${rep.benefits.map((b) => `<li>${renderInline(b)}</li>`).join('')}
+            </ul>
+          </div>`
+        : ''
+    }
+
+    ${
+      rep.salary_signal
+        ? `<div class="rep-card">
+            <div class="rep-card__head">${badge('薪资信号', 'neutral')}</div>
+            <p class="rep-card__detail">${renderInline(rep.salary_signal.data)}</p>
+            <p class="rep-card__src">
+              来源：${escapeHtml(rep.salary_signal.source)}
+              ${rep.salary_signal.url ? ` · <a class="source-line__link" href="${escapeHtml(rep.salary_signal.url)}" target="_blank" rel="noopener noreferrer">查看 ↗</a>` : ''}
+            </p>
+          </div>`
+        : ''
+    }
+
+    ${
+      rep.hiring_trend
+        ? `<div class="rep-card">
+            <div class="rep-card__head">${badge('招聘趋势', 'soft')}</div>
+            <p class="rep-card__detail">${renderInline(rep.hiring_trend)}</p>
+          </div>`
+        : ''
+    }
+
+    ${rep.notes ? `<div class="notice notice--mixed">${renderInline(rep.notes)}</div>` : ''}
+
+    ${
+      (rep.sources ?? []).length
+        ? `<div class="rep-sources">
+            <span class="rep-sources__label">信息来源</span>
+            ${rep.sources
+              .map(
+                (s) => `<a class="rep-sources__item" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">
+                  ${escapeHtml(s.type)} ↗
+                </a>`
+              )
+              .join('')}
+          </div>`
+        : ''
+    }
+  </section>`;
 }

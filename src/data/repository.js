@@ -25,7 +25,7 @@ const QUESTION_SEARCH_BLOCKS = [['scoring_points', 'text'], ['pitfalls', 'text']
  * @param {import('./provider.js').Provider} provider
  */
 export async function createRepository(provider) {
-  const [taxonomy, sourcesDoc, partsDoc, knowledge, questions, companies, projects] = await Promise.all([
+  const [taxonomy, sourcesDoc, partsDoc, knowledge, questions, companies, projects, reputation] = await Promise.all([
     provider.loadTaxonomy(),
     provider.loadSources(),
     provider.loadParts(),
@@ -33,7 +33,8 @@ export async function createRepository(provider) {
     provider.loadQuestions(),
     // 公司档案是可选数据源：Provider 没实现就返回空数组，界面自动隐藏该模块
     typeof provider.loadCompanies === 'function' ? provider.loadCompanies() : Promise.resolve([]),
-    typeof provider.loadProjects === 'function' ? provider.loadProjects() : Promise.resolve([])
+    typeof provider.loadProjects === 'function' ? provider.loadProjects() : Promise.resolve([]),
+    typeof provider.loadReputation === 'function' ? provider.loadReputation() : Promise.resolve([])
   ]);
 
   /** @type {Map<string, any>} */
@@ -59,6 +60,12 @@ export async function createRepository(provider) {
     if (!p?.id) continue;
     if (projectById.has(p.id)) throw new Error(`开源项目 id 重复: ${p.id}`);
     projectById.set(p.id, p);
+  }
+
+  /** @type {Map<string, any>} 公司 id → 口碑 */
+  const reputationByCompany = new Map();
+  for (const r of reputation ?? []) {
+    if (r?.company_id) reputationByCompany.set(r.company_id, r);
   }
 
   for (const s of sourcesDoc.sources ?? []) sourceById.set(s.source_id, s);
@@ -366,6 +373,16 @@ export async function createRepository(provider) {
     projectForCompany(company) {
       const pid = company?.project_id;
       return pid ? projectById.get(pid) ?? null : null;
+    },
+
+    /** 某公司的口碑（可能没有） */
+    reputationOf(companyId) {
+      return reputationByCompany.get(companyId) ?? null;
+    },
+
+    /** 投诉/不建议去的公司（口碑里 verdict 含「无」「不」的） */
+    reputationAll() {
+      return [...reputationByCompany.values()];
     },
 
     /** 供校验脚本/调试使用：暴露全部原始条目 */
