@@ -35,7 +35,8 @@ const DEFAULT_PATHS = {
   questions: null,
   companies: null,
   projects: null,
-  reputation: null
+  reputation: null,
+  outsiders: null
 };
 
 /** manifest 加载失败时的兜底（保证老站点仍能跑） */
@@ -44,7 +45,8 @@ const FALLBACK_FILES = {
   questions: ['data/questions/hardware.json', 'data/questions/embedded.json'],
   companies: [],
   projects: ['data/projects.json'],
-  reputation: ['data/reputation.json']
+  reputation: ['data/reputation.json'],
+  outsiders: ['data/outsiders.json']
 };
 
 /**
@@ -167,7 +169,8 @@ export function createJsonProvider(options = {}) {
             questions: Array.isArray(doc?.questions) ? doc.questions : FALLBACK_FILES.questions,
             companies: Array.isArray(doc?.companies) ? doc.companies : FALLBACK_FILES.companies,
             projects: Array.isArray(doc?.projects) ? doc.projects : FALLBACK_FILES.projects,
-            reputation: Array.isArray(doc?.reputation) ? doc.reputation : FALLBACK_FILES.reputation
+            reputation: Array.isArray(doc?.reputation) ? doc.reputation : FALLBACK_FILES.reputation,
+            outsiders: Array.isArray(doc?.outsiders) ? doc.outsiders : FALLBACK_FILES.outsiders
           };
         } catch {
           return { ...FALLBACK_FILES };
@@ -233,6 +236,20 @@ export function createJsonProvider(options = {}) {
       loadedCounts = { ...(loadedCounts ?? { knowledge: 0, questions: 0 }), companies: files.length };
       return fetchMerged(files, 'companies');
     },
+    /** 外省总部桂林上岗的公司（可选） */
+    async loadOutsiders() {
+      const files = paths.outsiders ?? (await loadManifest()).outsiders;
+      if (!files || !files.length) return [];
+      return fetchMerged(files, 'companies');
+    },
+
+    async loadOutsidersRanking() {
+      const files = paths.outsiders ?? (await loadManifest()).outsiders;
+      if (!files || !files.length) return null;
+      const doc = await fetchJson(files[0]);
+      return doc?.ranking ?? null;
+    },
+
     /** 公司口碑（可选） */
     async loadReputation() {
       const files = paths.reputation ?? (await loadManifest()).reputation;

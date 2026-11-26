@@ -179,6 +179,12 @@ export function createEncryptedProvider(options = {}) {
     },
     async loadReputation() {
       return (await ensureContent()).reputation ?? [];
+    },
+    async loadOutsiders() {
+      return (await ensureContent()).outsiders ?? [];
+    },
+    async loadOutsidersRanking() {
+      return (await ensureContent()).outsidersRanking ?? null;
     }
   };
 

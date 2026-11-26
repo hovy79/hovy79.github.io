@@ -2079,3 +2079,121 @@ mark.hit {
   .rep-card { padding: 0.6rem 0.7rem; }
   .rep-warn { font-size: 0.74rem; }
 }
+
+/* ============================================================
+   外省公司在桂林
+   ============================================================ */
+
+.outgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.outcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.outcard:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.outcard__top { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.outcard__name {
+  margin: 0.15rem 0 0;
+  font-size: 0.94rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+.outcard__hq {
+  font-size: 0.73rem;
+  color: var(--text-faint);
+}
+.outcard__sep { margin: 0 0.3rem; opacity: 0.5; }
+.outcard__note {
+  margin: 0.1rem 0 0;
+  font-size: 0.77rem;
+  line-height: 1.65;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.outcard__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: auto;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.73rem;
+}
+.outcard__roles { color: var(--text-faint); }
+.outcard__salary { color: var(--ok); font-weight: 600; }
+
+/* 岗位卡片网格 */
+.rolegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+.rolecard {
+  padding: 0.6rem 0.7rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+}
+.rolecard__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.rolecard__salary {
+  font-size: 0.8rem;
+  color: var(--ok);
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+.rolecard__meta {
+  font-size: 0.71rem;
+  color: var(--text-faint);
+  margin-top: 0.15rem;
+}
+.rolecard__focus {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px dashed var(--line-soft);
+}
+
+.notice--ok {
+  background: var(--ok-soft);
+  border-left: 3px solid var(--ok);
+}
+.notice--warn {
+  background: var(--warn-soft);
+  border-left: 3px solid var(--warn);
+}
+
+@media (max-width: 560px) {
+  .outgrid { grid-template-columns: 1fr; }
+  .rolegrid { grid-template-columns: 1fr 1fr; }
+  .outcard { padding: 0.75rem 0.8rem; }
+  .outcard__note { -webkit-line-clamp: 3; }
+}
+@media (max-width: 380px) {
+  .rolegrid { grid-template-columns: 1fr; }
+}

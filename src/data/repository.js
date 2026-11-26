@@ -25,7 +25,7 @@ const QUESTION_SEARCH_BLOCKS = [['scoring_points', 'text'], ['pitfalls', 'text']
  * @param {import('./provider.js').Provider} provider
  */
 export async function createRepository(provider) {
-  const [taxonomy, sourcesDoc, partsDoc, knowledge, questions, companies, projects, reputation] = await Promise.all([
+  const [taxonomy, sourcesDoc, partsDoc, knowledge, questions, companies, projects, reputation, outsiders] = await Promise.all([
     provider.loadTaxonomy(),
     provider.loadSources(),
     provider.loadParts(),
@@ -34,7 +34,8 @@ export async function createRepository(provider) {
     // 公司档案是可选数据源：Provider 没实现就返回空数组，界面自动隐藏该模块
     typeof provider.loadCompanies === 'function' ? provider.loadCompanies() : Promise.resolve([]),
     typeof provider.loadProjects === 'function' ? provider.loadProjects() : Promise.resolve([]),
-    typeof provider.loadReputation === 'function' ? provider.loadReputation() : Promise.resolve([])
+    typeof provider.loadReputation === 'function' ? provider.loadReputation() : Promise.resolve([]),
+    typeof provider.loadOutsiders === 'function' ? provider.loadOutsiders() : Promise.resolve([])
   ]);
 
   /** @type {Map<string, any>} */
@@ -60,6 +61,18 @@ export async function createRepository(provider) {
     if (!p?.id) continue;
     if (projectById.has(p.id)) throw new Error(`开源项目 id 重复: ${p.id}`);
     projectById.set(p.id, p);
+  }
+
+  /** @type {Map<string, any>} 外省公司 id → 档案 */
+  const outsiderById = new Map();
+  for (const o of outsiders ?? []) {
+    if (o?.id) outsiderById.set(o.id, o);
+  }
+
+  /** 外省公司文件的 ranking 字段（「只投一家投谁」的建议） */
+  let outsidersRanking = null;
+  if (typeof provider.loadOutsidersRanking === 'function') {
+    outsidersRanking = await provider.loadOutsidersRanking();
   }
 
   /** @type {Map<string, any>} 公司 id → 口碑 */
@@ -373,6 +386,21 @@ export async function createRepository(provider) {
     projectForCompany(company) {
       const pid = company?.project_id;
       return pid ? projectById.get(pid) ?? null : null;
+    },
+
+    /** 外省总部、桂林上班的公司，按匹配度降序 */
+    listOutsiders() {
+      return [...outsiderById.values()].sort(
+        (a, b) => (b.match ?? 0) - (a.match ?? 0) || String(a.id).localeCompare(String(b.id))
+      );
+    },
+
+    outsider(id) {
+      return outsiderById.get(id) ?? null;
+    },
+
+    outsidersRanking() {
+      return outsidersRanking;
     },
 
     /** 某公司的口碑（可能没有） */
